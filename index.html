@@ -1,341 +1,245 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Heart, Music2, Play, Pause, RotateCcw, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Three Songs For You ❤️</title>
 
-const chapters = [
-  {
-    number: "00",
-    eyebrow: "Before the music begins",
-    title: "A small introduction, just for you",
-    message: "Press play first. There is something I wanted to say before sharing these three songs with you.",
-    file: "music/intro.mp3",
-    accent: "from-amber-300 to-rose-400",
-    glow: "shadow-amber-400/25",
-    icon: "💌",
-    button: "Open my introduction",
-    trackLabel: "A personal introduction",
-    unlockText: "Listen to the introduction to unlock the first song.",
-  },
-  {
-    number: "01",
-    eyebrow: "The first spark",
-    title: "The moment our paths crossed",
-    message: "Some meetings feel ordinary at first, then quietly become something you are very glad happened.",
-    file: "music/song1.mp3",
-    accent: "from-rose-400 to-pink-500",
-    glow: "shadow-rose-500/25",
-    icon: "💗",
-    button: "Open the first chapter",
-    trackLabel: "Song one, chosen for you",
-    unlockText: "Finish the introduction to unlock this song.",
-  },
-  {
-    number: "02",
-    eyebrow: "A little confession",
-    title: "The way you make things brighter",
-    message: "This one carries a little of your warmth, your energy, and the smile you leave behind after we talk.",
-    file: "music/song2.mp3",
-    accent: "from-fuchsia-400 to-violet-500",
-    glow: "shadow-fuchsia-500/25",
-    icon: "✨",
-    button: "Unlock the next feeling",
-    trackLabel: "Song two, chosen for you",
-    unlockText: "Listen to the first song to unlock this chapter.",
-  },
-  {
-    number: "03",
-    eyebrow: "One beautiful possibility",
-    title: "For all the moments still ahead",
-    message: "No big promises, just a song for the lovely possibility of more laughter, more stories, and more time together.",
-    file: "music/song3.mp3",
-    accent: "from-violet-400 to-indigo-500",
-    glow: "shadow-violet-500/25",
-    icon: "🌙",
-    button: "Reveal the final chapter",
-    trackLabel: "Song three, chosen for you",
-    unlockText: "Listen to the second song to unlock this chapter.",
-  },
-];
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1d1025, #3d1b4f);
+    color: white;
+    text-align: center;
+    overflow-x: hidden;
+}
 
-function FloatingHearts() {
-  const hearts = Array.from({ length: 16 }, (_, i) => ({
-    id: i,
-    left: `${(i * 29 + 7) % 100}%`,
-    delay: (i % 6) * 1.1,
-    duration: 7 + (i % 5),
-    size: 10 + (i % 4) * 5,
-  }));
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 40px 20px;
+}
 
-  return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-      {hearts.map((heart) => (
-        <motion.div
-          key={heart.id}
-          className="absolute bottom-[-30px] text-pink-300/20"
-          style={{ left: heart.left, fontSize: heart.size }}
-          animate={{ y: [0, -900], x: [0, 18, -12, 5], rotate: [0, 20, -15, 5], opacity: [0, 0.7, 0] }}
-          transition={{ duration: heart.duration, delay: heart.delay, repeat: Infinity, ease: "linear" }}
-        >
-          ♥
-        </motion.div>
-      ))}
+h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+    background: linear-gradient(to right, #fff, #ffc0cb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    color: #d2d2d2;
+    line-height: 1.6;
+    margin-bottom: 50px;
+}
+
+.chapter {
+    margin-bottom: 25px;
+}
+
+.reveal-btn {
+    background: linear-gradient(45deg,#ff4f87,#d946ef);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    padding: 15px 30px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.reveal-btn:hover {
+    transform: scale(1.05);
+}
+
+.song-content{
+    display:none;
+    margin-top:20px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border-radius:20px;
+    padding:25px;
+}
+
+audio{
+    width:100%;
+    margin-top:15px;
+}
+
+.final-message{
+    display:none;
+    margin-top:40px;
+    padding:25px;
+    background: rgba(255,255,255,0.08);
+    border-radius:20px;
+}
+
+.heart{
+    position:fixed;
+    color:rgba(255,192,203,0.15);
+    font-size:20px;
+    animation: float 10s linear infinite;
+}
+
+@keyframes float{
+    from{
+        transform:translateY(100vh);
+    }
+    to{
+        transform:translateY(-100px);
+    }
+}
+</style>
+
+<script>
+function reveal(id){
+    document.getElementById(id).style.display='block';
+}
+
+function songFinished(chapter){
+    if(chapter === 1){
+        document.getElementById('chapter2btn').style.display='inline-block';
+    }
+
+    if(chapter === 2){
+        document.getElementById('chapter3btn').style.display='inline-block';
+    }
+
+    if(chapter === 3){
+        document.getElementById('finalMessage').style.display='block';
+    }
+}
+
+window.onload = function(){
+    for(let i=0;i<15;i++){
+        let h = document.createElement('div');
+        h.className='heart';
+        h.innerHTML='♥';
+        h.style.left=Math.random()*100+'%';
+        h.style.animationDuration=(8+Math.random()*10)+'s';
+        h.style.fontSize=(15+Math.random()*20)+'px';
+        document.body.appendChild(h);
+    }
+}
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>💌 Three Songs For You</h1>
+
+    <p class="subtitle">
+        I could have simply sent you three songs.<br>
+        But some people deserve a little more effort.<br><br>
+
+        So here's a tiny musical letter.
+    </p>
+
+    <!-- CHAPTER 1 -->
+
+    <div class="chapter">
+
+        <button class="reveal-btn"
+                onclick="reveal('song1')">
+            ❤️ Open Chapter 1
+        </button>
+
+        <div id="song1" class="song-content">
+
+            <h2>The First Spark</h2>
+
+            <p>
+                Some meetings seem ordinary at first...
+                until one day you realise you're really happy they happened.
+            </p>
+
+            <audio controls onended="songFinished(1)">
+                song1.mp3
+            </audio>
+
+        </div>
+
     </div>
-  );
-}
 
-function Chapter({ chapter, index, unlocked, revealed, onReveal, onEnded, onPlayTrack }) {
-  const audioRef = useRef(null);
-  const [playing, setPlaying] = useState(false);
-  const [error, setError] = useState(false);
-  const toggleAudio = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    <!-- CHAPTER 2 -->
 
+    <div class="chapter">
 
-    try {
-      setError(false);
-      if (audio.paused) {
-        onPlayTrack(audio);
-        await audio.play();
-      } else {
-        audio.pause();
-      }
-    } catch {
-      setPlaying(false);
-      setError(true);
-    }
-  };
+        <button id="chapter2btn"
+                class="reveal-btn"
+                style="display:none"
+                onclick="reveal('song2')">
+            ✨ Unlock Chapter 2
+        </button>
 
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: unlocked ? 1 : 0.32, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.12 }}
-      className={`relative overflow-hidden rounded-[2rem] border ${
-        revealed ? "border-white/20 bg-white/10" : "border-white/10 bg-white/[0.055]"
-      } p-5 shadow-2xl backdrop-blur-xl sm:p-7 ${revealed ? chapter.glow : ""}`}
-    >
-      <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${chapter.accent}`} />
-      <div className="absolute -right-8 -top-10 text-[8rem] font-black leading-none text-white/[0.035]">
-        {chapter.number}
-      </div>
+        <div id="song2" class="song-content">
 
-      <div className="relative flex items-start gap-4">
-        <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${chapter.accent} text-2xl shadow-lg`}>
-          {chapter.icon}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.24em] text-pink-200/70">{chapter.eyebrow}</p>
-          <h2 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{chapter.title}</h2>
-        </div>
-      </div>
+            <h2>A Little Confession</h2>
 
-      <AnimatePresence mode="wait">
-        {!revealed ? (
-          <motion.div key="locked" exit={{ opacity: 0, scale: 0.98 }} className="relative mt-6">
-            <button
-              onClick={onReveal}
-              disabled={!unlocked}
-              className={`group flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 font-semibold transition ${
-                unlocked
-                  ? `bg-gradient-to-r ${chapter.accent} text-white shadow-lg hover:scale-[1.01] active:scale-[0.99]`
-                  : "cursor-not-allowed bg-white/5 text-white/35"
-              }`}
-            >
-              {unlocked ? <Sparkles className="h-5 w-5 transition group-hover:rotate-12" /> : <Heart className="h-5 w-5" />}
-              {unlocked ? chapter.button : "A little mystery, for now…"}
-            </button>
-            {!unlocked && <p className="mt-3 text-center text-sm text-white/40">{chapter.unlockText}</p>}
-          </motion.div>
-        ) : (
-          <motion.div
-            key="revealed"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            transition={{ duration: 0.55 }}
-            className="relative mt-6"
-          >
-            <p className="text-base leading-7 text-white/75">{chapter.message}</p>
+            <p>
+                This song reminds me of your energy, your smile,
+                and how easy it is to lose track of time talking to you.
+            </p>
 
-            <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/15 p-3">
-              <button
-                onClick={toggleAudio}
-                className={`grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-to-br ${chapter.accent} text-white shadow-lg transition hover:scale-105 active:scale-95`}
-                aria-label={playing ? "Pause audio" : "Play audio"}
-              >
-                {playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}
-              </button>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-white">{chapter.trackLabel}</p>
-                <p className="truncate text-xs text-white/45">Part {index + 1} of {chapters.length}</p>
-              </div>
-              <Music2 className="h-5 w-5 shrink-0 text-pink-200/60" />
-            </div>
+            <audio controls onended="songFinished(2)">
+                song2.mp3
+            </audio>
 
-            <audio
-              ref={audioRef}
-              preload="metadata"
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-              onEnded={() => {
-                setPlaying(false);
-                onEnded();
-              }}
-              onError={() => setError(true)}
-            >
-              <source src={chapter.file} type="audio/mpeg" />
-              Your browser does not support MP3 audio.
-            </audio>
-
-
-            {error ? (
-              <p className="mt-3 text-center text-xs text-rose-300">
-                Audio could not be loaded. Check that {chapter.file} exists and matches the filename exactly.
-              </p>
-            ) : (
-              <p className="mt-3 text-center text-xs text-white/35">
-                Listen until the end to unlock the next surprise.
-              </p>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.section>
-  );
-}
-
-export default function ThreeSongsForYou() {
-  const [revealed, setRevealed] = useState(Array(chapters.length).fill(false));
-  const [unlockedCount, setUnlockedCount] = useState(1);
-  const [finished, setFinished] = useState(false);
-
-  useEffect(() => {
-    document.title = "Three Songs For You";
-  }, []);
-
-  const reveal = (index) => {
-    setRevealed((current) => current.map((value, i) => (i === index ? true : value)));
-  };
-
-  const completeChapter = (index) => {
-    if (index < chapters.length - 1) {
-      setUnlockedCount((current) => Math.max(current, index + 2));
-      setTimeout(() => {
-        document.getElementById(`chapter-${index + 1}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 250);
-    } else {
-      setFinished(true);
-      setTimeout(() => {
-        document.getElementById("final-surprise")?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 250);
-    }
-  };
-
-  const playOnly = (activeAudio) => {
-    document.querySelectorAll("audio").forEach((audio) => {
-      if (audio !== activeAudio) audio.pause();
-    });
-  };
-
-
-  const restart = () => {
-    document.querySelectorAll("audio").forEach((audio) => {
-      audio.pause();
-      audio.currentTime = 0;
-    });
-    setRevealed(Array(chapters.length).fill(false));
-    setUnlockedCount(1);
-    setFinished(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  return (
-    <main className="relative min-h-screen overflow-hidden bg-[#120b1b] text-white selection:bg-pink-400/30">
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(236,72,153,0.2),transparent_35%),radial-gradient(circle_at_80%_35%,rgba(139,92,246,0.18),transparent_38%),radial-gradient(circle_at_50%_95%,rgba(244,114,182,0.12),transparent_34%)]" />
-      <FloatingHearts />
-
-      <div className="relative mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
-        <motion.header
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-12 text-center"
-        >
-          <motion.div
-            animate={{ rotate: [-4, 4, -4], scale: [1, 1.06, 1] }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            className="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-[1.75rem] border border-pink-200/20 bg-white/10 text-4xl shadow-2xl shadow-pink-500/20 backdrop-blur-xl"
-          >
-            💌
-          </motion.div>
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.32em] text-pink-200/65">A tiny musical letter</p>
-          <h1 className="bg-gradient-to-r from-white via-pink-100 to-violet-200 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-6xl">
-            Three songs for you
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-white/65 sm:text-lg">
-            First, a small personal introduction. Then three songs, each unlocking the next part of the story.
-          </p>
-          <div className="mx-auto mt-7 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/50 backdrop-blur">
-            <Heart className="h-3.5 w-3.5 fill-pink-300 text-pink-300" />
-            Open slowly. Listen fully. Smile freely.
-          </div>
-        </motion.header>
-
-        <div className="space-y-5">
-          {chapters.map((chapter, index) => (
-            <div id={`chapter-${index}`} key={chapter.number}>
-              <Chapter
-                chapter={chapter}
-                index={index}
-                unlocked={index < unlockedCount}
-                revealed={revealed[index]}
-                onReveal={() => reveal(index)}
-                onEnded={() => completeChapter(index)}
-                onPlayTrack={playOnly}
-              />
-            </div>
-          ))}
         </div>
 
-        <AnimatePresence>
-          {finished && (
-            <motion.section
-              id="final-surprise"
-              initial={{ opacity: 0, y: 30, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ type: "spring", stiffness: 110, damping: 16 }}
-              className="mt-8 overflow-hidden rounded-[2rem] border border-pink-200/20 bg-gradient-to-br from-pink-500/20 via-fuchsia-500/15 to-violet-500/20 p-7 text-center shadow-2xl shadow-pink-500/20 backdrop-blur-xl sm:p-10"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.16, 1], rotate: [-3, 3, -3] }}
-                transition={{ duration: 1.4, repeat: Infinity }}
-                className="mb-4 text-5xl"
-              >
-                ❤️
-              </motion.div>
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-pink-200/65">Your final surprise</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight">The fourth thing I wanted to share was not a song</h2>
-              <p className="mx-auto mt-4 max-w-lg leading-7 text-white/70">
-                It is simply this: I care about you, I am grateful that our paths crossed, and I hope this little musical journey made you feel as special as you are to me.
-              </p>
-              <p className="mx-auto mt-5 max-w-lg font-medium text-pink-100">
-                Thank you for listening all the way to the end. This was made just for you. 💗
-              </p>
-              <button
-                onClick={restart}
-                className="mx-auto mt-7 flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Experience it again
-              </button>
-            </motion.section>
-          )}
-        </AnimatePresence>
+    </div>
 
-        <footer className="mt-12 text-center text-xs text-white/35">
-          Made with care, a little courage, an introduction, and three very good songs.
-        </footer>
-      </div>
-    </main>
-  );
-}
+    <!-- CHAPTER 3 -->
+
+    <div class="chapter">
+
+        <button id="chapter3btn"
+                class="reveal-btn"
+                style="display:none"
+                onclick="reveal('song3')">
+            🌙 Reveal Final Chapter
+        </button>
+
+        <div id="song3" class="song-content">
+
+            <h2>One Beautiful Possibility</h2>
+
+            <p>
+                No big promises.
+                Just a song for all the conversations,
+                laughter and moments that might still be ahead.
+            </p>
+
+            <audio controls onended="songFinished(3)">
+                song3.mp3
+            </audio>
+
+        </div>
+
+    </div>
+
+    <!-- FINAL MESSAGE -->
+
+    <div id="finalMessage" class="final-message">
+
+        <h2>❤️ One Last Note</h2>
+
+        <p>
+            Thank you for listening.<br><br>
+
+            Every song tells a little story.<br>
+            You probably didn't realise it,
+            but you became part of mine.
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>
