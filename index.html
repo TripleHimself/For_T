@@ -111,16 +111,32 @@ function songFinished(chapter){
         document.getElementById('finalMessage').style.display='block';
     }
 }
+function createHeart(){
 
+    const heart = document.createElement('div');
+
+    heart.className = 'heart';
+    heart.innerHTML = '♥';
+
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.fontSize = (15 + Math.random() * 25) + 'px';
+
+    const duration = 8 + Math.random() * 8;
+
+    heart.style.animationDuration = duration + 's';
+
+    document.body.appendChild(heart);
+
+    setTimeout(() => {
+        heart.remove();
+    }, duration * 1000);
+}
+
+setInterval(createHeart, 800);
 window.onload = function(){
-    for(let i=0;i<15;i++){
-        let h = document.createElement('div');
-        h.className='heart';
-        h.innerHTML='♥';
-        h.style.left=Math.random()*100+'%';
-        h.style.animationDuration=(8+Math.random()*10)+'s';
-        h.style.fontSize=(15+Math.random()*20)+'px';
-        document.body.appendChild(h);
+
+    for(let i=0;i<10;i++){
+        setTimeout(createHeart, i * 300);
     }
 }
 </script>
