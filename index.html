@@ -874,11 +874,15 @@
     }
 
     function chapterMarkup(track, index) {
-      const locked = index > unlockedThrough;
 
-      return `
+    // Hide future chapters completely
+    if(index > unlockedThrough){
+        return "";
+    }
+
+    return `
         <article
-          class="chapter ${locked ? "locked" : ""}"
+          class="chapter"
           id="chapter-${index}"
           data-index="${index}"
           style="--gradient: ${track.gradient};"
@@ -905,16 +909,11 @@
 
           <div class="closed-content">
             <button
-              class="reveal-button"
-              type="button"
-              ${locked ? "disabled" : ""}
-            >
-              ${
-                locked
-                  ? "♡ A little mystery, for now…"
-                  : `✦ ${track.button}`
-              }
-            </button>
+class="reveal-button"
+type="button"
+>
+✦ ${track.button}
+</button>
 
             ${
               locked
@@ -1120,17 +1119,22 @@
       index,
       sourceChapter
     ) {
-      if (index < tracks.length - 1) {
-        const nextIndex = index + 1;
+      if (nextIndex > unlockedThrough) {
 
-        if (nextIndex > unlockedThrough) {
-          unlockedThrough = nextIndex;
+    unlockedThrough = nextIndex;
 
-          unlockChapter(
+    renderChapters();
+
+    setTimeout(() => {
+
+        unlockChapter(
             nextIndex,
             sourceChapter
-          );
-        }
+        );
+
+    },100);
+
+}
       } else if (
         !finalSurprise.classList.contains("visible")
       ) {
@@ -1151,14 +1155,41 @@
     }
 
     function unlockChapter(
-      index,
-      sourceChapter
-    ) {
-      const nextChapter =
-        document.getElementById(
-          `chapter-${index}`
+index,
+sourceChapter
+) {
+
+    const nextChapter =
+    document.getElementById(
+        `chapter-${index}`
+    );
+
+    if(!nextChapter){
+        return;
+    }
+
+    nextChapter.classList.add(
+        "just-unlocked"
+    );
+
+    heartExplosion(
+        sourceChapter,
+        44
+    );
+
+    setTimeout(() => {
+
+        nextChapter.classList.remove(
+            "just-unlocked"
         );
 
+        nextChapter.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+    },500);
+}
       const button =
         nextChapter.querySelector(
           ".reveal-button"
