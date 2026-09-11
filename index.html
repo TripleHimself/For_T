@@ -1,278 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Three Songs For You ❤️</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#120b1b">
+  <title>Three Songs For You</title>
 
-<style>
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #1d1025, #3d1b4f);
-    color: white;
-    text-align: center;
-    overflow-x: hidden;
-}
-#hearts-container{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    pointer-events:none;
-    overflow:hidden;
-    z-index:9999;
-}
-.container {
-    max-width: 800px;
-    margin: auto;
-    padding: 40px 20px;
-}
-
-h1 {
-    font-size: 3em;
-    margin-bottom: 10px;
-    background: linear-gradient(to right, #fff, #ffc0cb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-    color: #d2d2d2;
-    line-height: 1.6;
-    margin-bottom: 50px;
-}
-
-.chapter {
-    margin-bottom: 25px;
-}
-
-.reveal-btn {
-    background: linear-gradient(45deg,#ff4f87,#d946ef);
-    color: white;
-    border: none;
-    border-radius: 40px;
-    padding: 15px 30px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.reveal-btn:hover {
-    transform: scale(1.05);
-}
-
-.song-content{
-    display:none;
-    margin-top:20px;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(10px);
-    border-radius:20px;
-    padding:25px;
-}
-
-audio{
-    width:100%;
-    margin-top:15px;
-}
-
-.final-message{
-    display:none;
-    margin-top:40px;
-    padding:25px;
-    background: rgba(255,255,255,0.08);
-    border-radius:20px;
-}
-
-.heart{
-    position:fixed;
-    color:rgba(255,192,203,0.15);
-    font-size:20px;
-    animation: float 10s linear infinite;
-}
-
-@keyframes float{
-    from{
-        transform:translateY(100vh);
-    }
-    to{
-        transform:translateY(-100px);
-    }
-}
-</style>
-
-<script>
-function reveal(id){
-    document.getElementById(id).style.display='block';
-}
-
-function songFinished(chapter){
-
-    for(let i=0;i<20;i++){
-        setTimeout(createHeart, i * 100);
+  <style>
+    :root {
+      --bg: #120b1b;
+      --text: #fff9fc;
+      --muted: rgba(255, 255, 255, 0.64);
+      --border: rgba(255, 255, 255, 0.13);
     }
 
-    if(chapter === 1){
-        document.getElementById('chapter2btn').style.display='inline-block';
+    * {
+      box-sizing: border-box;
     }
 
-    if(chapter === 2){
-        document.getElementById('chapter3btn').style.display='inline-block';
+    html {
+      scroll-behavior: smooth;
     }
 
-    if(chapter === 3){
-        document.getElementById('finalMessage').style.display='block';
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(
+          circle at 18% 10%,
+          rgba(236, 72, 153, 0.22),
+          transparent 34%
+        ),
+        radial-gradient(
+          circle at 82% 35%,
+          rgba(139, 92, 246, 0.2),
+          transparent 38%
+        ),
+        radial-gradient(
+          circle at 50% 95%,
+          rgba(244, 114, 182, 0.13),
+          transparent 35%
+        ),
+        var(--bg);
     }
-}
-function createHeart(){
 
-    const heart = document.createElement('div');
-
-    heart.className = 'heart';
-    heart.innerHTML = '♥';
-
-    heart.style.left = Math.random() * 100 + '%';
-    heart.style.fontSize = (15 + Math.random() * 25) + 'px';
-
-    const duration = 8 + Math.random() * 8;
-
-    heart.style.animationDuration = duration + 's';
-
-    document.getElementById('hearts-container').appendChild(heart);
-
-    setTimeout(() => {
-        heart.remove();
-    }, duration * 1000);
-}
-
-setInterval(createHeart, 800);
-window.onload = function(){
-
-    for(let i=0;i<10;i++){
-        setTimeout(createHeart, i * 300);
+    button {
+      font: inherit;
     }
-}
-</script>
 
-</head>
+    /* Permanent heart layers */
 
-<body>
+    .background-hearts,
+    .burst-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
 
-<div class="container">
+    .background-hearts {
+      z-index: 0;
+    }
 
-    <h1>💌 Three Songs For You</h1>
+    .burst-layer {
+      z-index: 20;
+    }
 
-    <p class="subtitle">
-        I could have simply sent you three songs.<br>
-        But some people deserve a little more effort.<br><br>
+    .floating-heart {
+      position: absolute;
+      bottom: -40px;
+      color: rgba(249, 168, 212, 0.2);
+      animation: floatUp linear infinite;
+    }
 
-        So here's a tiny musical letter.
-    </p>
+    @keyframes floatUp {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0);
+        opacity: 0;
+      }
 
-    <!-- CHAPTER 1 -->
+      12% {
+        opacity: 0.7;
+      }
 
-    <div class="chapter">
+      100% {
+        transform:
+          translate3d(var(--drift), -115vh, 0)
+          rotate(35deg);
+        opacity: 0;
+      }
+    }
 
-        <button class="reveal-btn"
-                onclick="reveal('song1')">
-            ❤️ Click ❤️
-        </button>
+    /* Main page */
 
-        <div id="song1" class="song-content">
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(760px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 72px 0 48px;
+    }
 
-            <h2>Intro</h2>
+    header {
+      margin-bottom: 48px;
+      text-align: center;
+      animation: arrive 0.8s ease both;
+    }
 
-            <p>
-                Very small into from someone small
-            </p>
+    @keyframes arrive {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
 
-            <audio controls onended="songFinished(1)">
-               <source src="Intro.mp3" type="audio/mpeg">
-              Your browser does not support the audio element.
-            </audio>
-            </audio>
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-        </div>
+    .letter-icon {
+      display: grid;
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 22px;
+      place-items: center;
+      border: 1px solid rgba(251, 207, 232, 0.2);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.09);
+      box-shadow: 0 24px 60px rgba(236, 72, 153, 0.2);
+      font-size: 38px;
+      animation: breathe 3.5s ease-in-out infinite;
+      backdrop-filter: blur(18px);
+    }
 
-    </div>
+    @keyframes breathe {
+      0%,
+      100% {
+        transform: rotate(-3deg) scale(1);
+      }
 
-    <!-- CHAPTER 2 -->
+      50% {
+        transform: rotate(3deg) scale(1.06);
+      }
+    }
 
-    <div class="chapter">
+    .kicker {
+      margin: 0 0 12px;
+      color: rgba(251, 207, 232, 0.68);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
 
-        <button id="chapter2btn"
-                class="reveal-btn"
-                style="display:none"
-                onclick="reveal('song2')">
-            ✨ Unlock Chapter 2
-        </button>
+    h1 {
+      margin: 0;
+      background: linear-gradient(
+        90deg,
+        #ffffff,
+        #fce7f3,
+        #ddd6fe
+      );
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      font-size: clamp(2.5rem, 7vw, 4.1rem);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
 
-        <div id="song2" class="song-content">
+    .intro-copy {
+      max-width: 590px;
+      margin: 20px auto 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+    }
 
-            <h2>A Little Confession</h2>
+    .instruction {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 26px;
+      padding: 10px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      backdrop-filter: blur(10px);
+    }
 
-            <p>
-                This song reminds me of your energy, your smile,
-                and how easy it is to lose track of time talking to you.
-            </p>
+    .instruction span {
+      color: #f9a8d4;
+    }
 
-            <audio controls onended="songFinished(2)">
-                <source src="Intro.mp3" type="audio/mpeg">
-              Your browser does not support the audio element.
-            </audio>
+    /* Chapters */
 
-        </div>
+    .chapters {
+      display: grid;
+      gap: 20px;
+    }
 
-    </div>
+    .chapter {
+      position: relative;
+      scroll-margin: 32px;
+      overflow: hidden;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.065);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+      transition:
+        opacity 0.55s ease,
+        transform 0.55s ease,
+        background 0.4s ease,
+        box-shadow 0.4s ease;
+      backdrop-filter: blur(20px);
+    }
 
-    <!-- CHAPTER 3 -->
+    .chapter.locked {
+      opacity: 0.34;
+    }
 
-    <div class="chapter">
+    .chapter.just-unlocked {
+      animation: unlockPulse 0.9s ease;
+    }
 
-        <button id="chapter3btn"
-                class="reveal-btn"
-                style="display:none"
-                onclick="reveal('song3')">
-            🌙 Reveal Final Chapter
-        </button>
+    @keyframes unlockPulse {
+      0% {
+        transform: scale(0.97);
+        filter: brightness(1);
+      }
 
-        <div id="song3" class="song-content">
+      45% {
+        transform: scale(1.018);
+        filter: brightness(1.35);
+      }
 
-            <h2>One Beautiful Possibility</h2>
+      100% {
+        transform: scale(1);
+        filter: brightness(1);
+      }
+    }
 
-            <p>
-                No big promises.
-                Just a song for all the conversations,
-                laughter and moments that might still be ahead.
-            </p>
+    .chapter::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 4px;
+      background: var(--gradient);
+    }
 
-            <audio controls onended="songFinished(3)">
-                <source src="Intro.mp3" type="audio/mpeg">
-              Your browser does not support the audio element.
-            </audio>
+    .chapter-number {
+      position: absolute;
+      top: -28px;
+      right: -12px;
+      color: rgba(255, 255, 255, 0.035);
+      font-size: 128px;
+      font-weight: 900;
+      line-height: 1;
+      user-select: none;
+    }
 
-        </div>
+    .chapter-header {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
 
-    </div>
+    .chapter-icon {
+      display: grid;
+      flex: 0 0 56px;
+      width: 56px;
+      height: 56px;
+      place-items: center;
+      border-radius: 18px;
+      background: var(--gradient);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+      font-size: 25px;
+    }
 
-    <!-- FINAL MESSAGE -->
+    .eyebrow {
+      margin: 2px 0 6px;
+      color: rgba(251, 207, 232, 0.68);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
 
-    <div id="finalMessage" class="final-message">
+    h2 {
+      margin: 0;
+      font-size: clamp(1.25rem, 4vw, 1.55rem);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
 
-        <h2>❤️ One Last Note</h2>
+    .closed-content,
+    .revealed-content {
+      position: relative;
+      margin-top: 24px;
+    }
 
-        <p>
-            Thank you for listening.<br><br>
-
-            Every song tells a little story.<br>
-            You probably didn't realise it,
-            but you became part of mine.
-        </p>
-
-    </div>
-
-</div>
-
-</body>
-</html>
+    .reveal-button {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 16px 20px;
+      border: 0;
+      border-radius: 17px;
+      background: var(--gradient);
+      box-shadow: 0 14px
