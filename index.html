@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#120b1b" />
+  <title>Three Songs For You</title>
+
+  <style>
+    :root { --bg:#120b1b; --text:#fff9fc; --muted:rgba(255,255,255,.64); --border:rgba(255,255,255,.13); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0; min-height:100vh; overflow-x:hidden; color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at 18% 10%,rgba(236,72,153,.22),transparent 34%),radial-gradient(circle at 82% 35%,rgba(139,92,246,.2),transparent 38%),radial-gradient(circle at 50% 95%,rgba(244,114,182,.13),transparent 35%),var(--bg);
+    }
+    button { font:inherit; }
+    .background-hearts,.burst-layer { position:fixed; inset:0; pointer-events:none; overflow:hidden; }
+    .background-hearts { z-index:0; }
+    .burst-layer { z-index:20; }
+    .floating-heart { position:absolute; bottom:-40px; color:rgba(249,168,212,.2); animation:floatUp linear infinite; }
+    @keyframes floatUp { 0%{transform:translate3d(0,0,0) rotate(0);opacity:0} 12%{opacity:.7} 100%{transform:translate3d(var(--drift),-115vh,0) rotate(35deg);opacity:0} }
+    .page { position:relative; z-index:1; width:min(760px,calc(100% - 32px)); margin:0 auto; padding:72px 0 48px; }
+    header { margin-bottom:48px; text-align:center; animation:arrive .8s ease both; }
+    @keyframes arrive { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .letter-icon { display:grid; width:82px; height:82px; margin:0 auto 22px; place-items:center; border:1px solid rgba(251,207,232,.2); border-radius:28px; background:rgba(255,255,255,.09); box-shadow:0 24px 60px rgba(236,72,153,.2); font-size:38px; animation:breathe 3.5s ease-in-out infinite; backdrop-filter:blur(18px); }
+    @keyframes breathe { 0%,100%{transform:rotate(-3deg) scale(1)} 50%{transform:rotate(3deg) scale(1.06)} }
+    .kicker { margin:0 0 12px; color:rgba(251,207,232,.68); font-size:18px; font-weight:800; letter-spacing:.3em; text-transform:uppercase; }
+    .kicker2 { margin:0 0 12px; color:rgba(251,207,232,.68); font-size:14px; font-weight:800; letter-spacing:.3em; text-transform:uppercase; }
+    h1 { margin:0; background:linear-gradient(90deg,#fff,#fce7f3,#ddd6fe); background-clip:text; -webkit-background-clip:text; color:transparent; font-size:clamp(2.5rem,7vw,4.1rem); line-height:1.05; letter-spacing:-.045em; }
+    .intro-copy { max-width:590px; margin:20px auto 0; color:var(--muted); font-size:17px; line-height:1.7; }
+    .instruction { display:inline-flex; align-items:center; gap:8px; margin-top:26px; padding:10px 16px; border:1px solid rgba(255,255,255,.1); border-radius:999px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.5); font-size:12px; backdrop-filter:blur(10px); }
+    .instruction span { color:#f9a8d4; }
+    .chapters { display:grid; gap:20px; }
+    .chapter { position:relative; scroll-margin:32px; overflow:hidden; padding:24px; border:1px solid var(--border); border-radius:32px; background:rgba(255,255,255,.065); box-shadow:0 24px 70px rgba(0,0,0,.25); transition:opacity .55s ease,transform .55s ease,background .4s ease,box-shadow .4s ease; backdrop-filter:blur(20px); }
+    .chapter.locked { opacity:.34; }
+    .chapter.just-unlocked { animation:unlockPulse .9s ease; }
+    @keyframes unlockPulse { 0%{transform:scale(.97);filter:brightness(1)} 45%{transform:scale(1.018);filter:brightness(1.35)} 100%{transform:scale(1);filter:brightness(1)} }
+    .chapter::before { content:""; position:absolute; top:0; right:0; left:0; height:4px; background:var(--gradient); }
+    .chapter-number { position:absolute; top:-28px; right:-12px; color:rgba(255,255,255,.035); font-size:128px; font-weight:900; line-height:1; user-select:none; }
+    .chapter-header { position:relative; display:flex; align-items:flex-start; gap:16px; }
+    .chapter-icon { display:grid; flex:0 0 56px; width:56px; height:56px; place-items:center; border-radius:18px; background:var(--gradient); box-shadow:0 12px 30px rgba(0,0,0,.22); font-size:25px; }
+    .eyebrow { margin:2px 0 6px; color:rgba(251,207,232,.68); font-size:11px; font-weight:750; letter-spacing:.22em; text-transform:uppercase; }
+    h2 { margin:0; font-size:clamp(1.25rem,4vw,1.55rem); line-height:1.25; letter-spacing:-.02em; }
+    .closed-content,.revealed-content { position:relative; margin-top:24px; }
+    .reveal-button { display:flex; width:100%; align-items:center; justify-content:center; gap:9px; padding:16px 20px; border:0; border-radius:17px; background:var(--gradient); box-shadow:0 14px 34px rgba(0,0,0,.2); color:#fff; cursor:pointer; font-weight:750; transition:transform .2s ease,filter .2s ease; }
+    .reveal-button:hover:not(:disabled){transform:scale(1.01);filter:brightness(1.09)}
+    .reveal-button:disabled{background:rgba(255,255,255,.06);box-shadow:none;color:rgba(255,255,255,.36);cursor:not-allowed}
+    .lock-note,.listen-note,.audio-error { margin:12px 0 0; text-align:center; font-size:12px; }
+    .lock-note,.listen-note { color:rgba(255,255,255,.38); }
+    .audio-error { color:#fda4af; }
+    .revealed-content { display:none; }
+    .chapter.revealed .closed-content { display:none; }
+    .chapter.revealed .revealed-content { display:block; animation:contentOpen .55s ease both; }
+    @keyframes contentOpen { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+    .message { margin:0; color:rgba(255,255,255,.74); font-size:16px; line-height:1.72; }
+    .player { display:flex; align-items:center; gap:12px; margin-top:20px; padding:12px; border:1px solid rgba(255,255,255,.1); border-radius:18px; background:rgba(0,0,0,.16); }
+    .play-button { display:grid; flex:0 0 48px; width:48px; height:48px; place-items:center; border:0; border-radius:50%; background:var(--gradient); box-shadow:0 10px 24px rgba(0,0,0,.24); color:#fff; cursor:pointer; font-size:19px; transition:transform .2s ease; }
+    .play-button:hover { transform:scale(1.06); }
+    .track-info { min-width:0; flex:1; text-align:left; }
+    .track-title,.track-part { overflow:hidden; margin:0; text-overflow:ellipsis; white-space:nowrap; }
+    .track-title { color:#fff; font-size:14px; font-weight:720; }
+    .track-part { margin-top:3px; color:rgba(255,255,255,.43); font-size:12px; }
+    .music-symbol { color:rgba(251,207,232,.65); font-size:20px; }
+    .progress-shell { height:5px; margin-top:12px; overflow:hidden; border-radius:99px; background:rgba(255,255,255,.08); }
+    .progress-bar { width:0; height:100%; border-radius:inherit; background:var(--gradient); transition:width .2s linear; }
+    .final-surprise { display:none; scroll-margin:30px; margin-top:28px; padding:38px 28px; overflow:hidden; border:1px solid rgba(251,207,232,.22); border-radius:32px; background:linear-gradient(135deg,rgba(236,72,153,.21),rgba(192,38,211,.15),rgba(124,58,237,.19)); box-shadow:0 24px 70px rgba(236,72,153,.2); text-align:center; backdrop-filter:blur(20px); }
+    .final-surprise.visible { display:block; animation:finalReveal .9s cubic-bezier(.2,.85,.24,1.25) both; }
+    @keyframes finalReveal { from{opacity:0;transform:translateY(30px) scale(.94)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .final-heart { margin-bottom:14px; font-size:54px; animation:heartbeat 1.25s ease-in-out infinite; }
+    @keyframes heartbeat { 0%,100%{transform:scale(1)} 35%{transform:scale(1.18)} 52%{transform:scale(1.05)} 68%{transform:scale(1.16)} }
+    .final-surprise h2 { margin-top:10px; font-size:clamp(1.8rem,5vw,2.25rem); }
+    .final-surprise p:not(.eyebrow) { max-width:560px; margin:16px auto 0; color:rgba(255,255,255,.72); line-height:1.72; }
+    .final-line { color:#fce7f3!important; font-weight:700; }
+    .restart-button { margin-top:26px; padding:12px 20px; border:1px solid rgba(255,255,255,.16); border-radius:999px; background:rgba(255,255,255,.1); color:#fff; cursor:pointer; font-weight:700; }
+    footer { margin-top:42px; color:rgba(255,255,255,.34); text-align:center; font-size:12px; }
+    .burst-heart { position:fixed; left:0; top:0; color:var(--heart-color); font-size:var(--heart-size); line-height:1; opacity:0; filter:drop-shadow(0 4px 8px rgba(236,72,153,.3)); animation:heartBurst var(--duration) cubic-bezier(.1,.75,.25,1) forwards; will-change:transform,opacity; }
+    @keyframes heartBurst { 0%{opacity:0;transform:translate3d(var(--start-x),var(--start-y),0) scale(.2) rotate(0)} 12%{opacity:1} 68%{opacity:.95} 100%{opacity:0;transform:translate3d(calc(var(--start-x) + var(--move-x)),calc(var(--start-y) + var(--move-y)),0) scale(1.35) rotate(var(--rotation))} }
+    @media(max-width:560px){.page{width:min(100% - 22px,760px);padding-top:48px}.chapter{padding:20px;border-radius:26px}.chapter-icon{flex-basis:50px;width:50px;height:50px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.background-hearts{display:none}}
+  </style>
+</head>
+<body>
+  <div class="background-hearts" id="backgroundHearts" aria-hidden="true"></div>
+  <div class="burst-layer" id="burstLayer" aria-hidden="true"></div>
+  <main class="page">
+    <header>
+      <div class="letter-icon">💌</div>
+      <p class="kicker2">I could have simply sent you three songs<br>
+        But some people deserve a little more effort<br></p><p class="kicker">A tiny musical letter</p>
+       
+      <p class="intro-copy">First, a small personal introduction. Then three songs, with each part unlocking only after the previous one has finished.</p>
+      <div class="instruction"><span>♥</span> Open slowly. Listen fully. Smile freely.<span>♥</span></div>
+    </header>
+    <section class="chapters" id="chapters"></section>
+    <section class="final-surprise" id="finalSurprise" aria-live="polite">
+      <div class="final-heart">❤️</div>
+      <p class="eyebrow">Your final surprise</p>
+      <h2>The fourth thing I wanted to share was not a song</h2>
+      <p>It is simply this: I care about you, I am grateful that our paths crossed, and I hope this little musical journey made you feel as special as you are to me.</p>
+      <p class="final-line">Thank you for listening all the way to the end. This was made just for you. 💗</p>
+      <button class="restart-button" id="restartButton" type="button">↻ Experience it again</button>
+    </section>
+    <footer>Made with care, a little courage, an introduction, and three very good songs.</footer>
+  </main>
+<script>
+const tracks=[
+{number:"00",eyebrow:"Before the music begins",title:"A small introduction, just for you",message:"Press play first. There is something small someone wanted to say before sharing these three songs with you.",file:"Intro.mp3",gradient:"linear-gradient(135deg,#fcd34d,#fb7185)",icon:"💌",button:"Open my introduction",label:"A personal introduction",lockedMessage:"Begin here to unlock the first song."},
+{number:"01",eyebrow:"The first spark",title:"The moment our paths crossed",message:"Some meetings feel ordinary at first, then quietly become something you are very glad happened.",file:"Intro.mp3",gradient:"linear-gradient(135deg,#fb7185,#ec4899)",icon:"💗",button:"Open the first chapter",label:"Melodiya for T.",lockedMessage:"Listen to the introduction to unlock this song."},
+{number:"02",eyebrow:"A little confession",title:"The way you make things brighter",message:"No big promises, just a song for the lovely possibility of more laughter, more stories, and more time together.",file:"Intro.mp3",gradient:"linear-gradient(135deg,#e879f9,#8b5cf6)",icon:"✨",button:"Unlock the next feeling",label:"Song two, chosen for you",lockedMessage:"Listen to the first song to unlock this chapter."},
+{number:"03",eyebrow:"One beautiful possibility",title:"For all the moments still ahead",message:"This one carries your warmth, your energy and the smile you leave behind after we talk.",file:"Intro.mp3",gradient:"linear-gradient(135deg,#a78bfa,#6366f1)",icon:"🌙",button:"Reveal the final chapter",label:"Did I find myself in you?",lockedMessage:"Listen to the second song to unlock this chapter."}
+];
+const chaptersElement=document.getElementById("chapters"),finalSurprise=document.getElementById("finalSurprise"),restartButton=document.getElementById("restartButton");let unlockedThrough=0;
+function createBackgroundHearts(){const c=document.getElementById("backgroundHearts");for(let i=0;i<18;i++){const h=document.createElement("span");h.className="floating-heart";h.textContent="♥";h.style.left=`${(i*29+7)%100}%`;h.style.fontSize=`${10+(i%4)*5}px`;h.style.animationDelay=`${(i%7)*1.05}s`;h.style.animationDuration=`${7+(i%6)}s`;h.style.setProperty("--drift",`${-24+(i%5)*13}px`);c.appendChild(h)}}
+function chapterMarkup(t,i){const locked=i>unlockedThrough;return `<article class="chapter ${locked?"locked":""}" id="chapter-${i}" data-index="${i}" style="--gradient:${t.gradient}"><div class="chapter-number">${t.number}</div><div class="chapter-header"><div class="chapter-icon">${t.icon}</div><div><p class="eyebrow">${t.eyebrow}</p><h2>${t.title}</h2></div></div><div class="closed-content"><button class="reveal-button" type="button" ${locked?"disabled":""}>${locked?"♡ A little mystery, for now… ♡":`✦ ${t.button}`}</button>${locked?`<p class="lock-note">${t.lockedMessage}</p>`:""}</div><div class="revealed-content"><p class="message">${t.message}</p><div class="player"><button class="play-button" type="button" aria-label="Play ${t.label}">▶</button><div class="track-info"><p class="track-title">${t.label}</p><p class="track-part">Part ${i+1} of ${tracks.length}</p></div><span class="music-symbol">♫</span></div><div class="progress-shell"><div class="progress-bar"></div></div><audio preload="metadata"><source src="${t.file}" type="audio/mpeg">Your browser does not support MP3 audio.</audio><p class="listen-note">Listen until the end to unlock the next surprise.</p><p class="audio-error" hidden>Audio could not be loaded. Check that <strong>${t.file}</strong> exists and matches the filename exactly.</p></div></article>`}
+function renderChapters(){chaptersElement.innerHTML=tracks.map(chapterMarkup).join("");attachChapterEvents()}
+function attachChapterEvents(){document.querySelectorAll(".chapter").forEach(ch=>{const i=Number(ch.dataset.index),r=ch.querySelector(".reveal-button"),p=ch.querySelector(".play-button"),a=ch.querySelector("audio"),bar=ch.querySelector(".progress-bar"),err=ch.querySelector(".audio-error");r.addEventListener("click",()=>{if(i<=unlockedThrough)ch.classList.add("revealed")});p.addEventListener("click",async()=>{pauseOtherTracks(a);err.hidden=true;try{a.paused?await a.play():a.pause()}catch(e){p.textContent="▶";err.hidden=false}});a.addEventListener("play",()=>{p.textContent="❚❚"});a.addEventListener("pause",()=>{p.textContent="▶"});a.addEventListener("timeupdate",()=>{bar.style.width=`${a.duration?(a.currentTime/a.duration)*100:0}%`});a.addEventListener("error",()=>err.hidden=false);a.addEventListener("ended",()=>{p.textContent="▶";bar.style.width="100%";completeChapter(i,ch)})})}
+function pauseOtherTracks(active){document.querySelectorAll("audio").forEach(a=>{if(a!==active)a.pause()})}
+function completeChapter(i,source){if(i<tracks.length-1){const n=i+1;if(n>unlockedThrough){unlockedThrough=n;unlockChapter(n,source)}}else if(!finalSurprise.classList.contains("visible")){finalSurprise.classList.add("visible");heartExplosion(finalSurprise,64);setTimeout(()=>finalSurprise.scrollIntoView({behavior:"smooth",block:"center"}),350)}}
+function unlockChapter(i,source){const next=document.getElementById(`chapter-${i}`),button=next.querySelector(".reveal-button"),note=next.querySelector(".lock-note");next.classList.remove("locked");next.classList.add("just-unlocked");button.disabled=false;button.innerHTML=`✦ ${tracks[i].button}`;if(note)note.remove();heartExplosion(source,44);setTimeout(()=>{next.classList.remove("just-unlocked");next.scrollIntoView({behavior:"smooth",block:"center"})},500)}
+function heartExplosion(target,amount=44){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const layer=document.getElementById("burstLayer"),rect=target.getBoundingClientRect(),x=rect.left+rect.width/2,y=Math.min(innerHeight-80,rect.top+rect.height/2),colors=["#fb7185","#f472b6","#f9a8d4","#e879f9","#c4b5fd","#fff"];for(let i=0;i<amount;i++){const h=document.createElement("span"),angle=Math.PI*2*i/amount+(Math.random()-.5)*.45,d=110+Math.random()*250;h.className="burst-heart";h.textContent=Math.random()>.18?"♥":"♡";h.style.setProperty("--start-x",`${x}px`);h.style.setProperty("--start-y",`${y}px`);h.style.setProperty("--move-x",`${Math.cos(angle)*d}px`);h.style.setProperty("--move-y",`${Math.sin(angle)*d-55}px`);h.style.setProperty("--rotation",`${-100+Math.random()*200}deg`);h.style.setProperty("--heart-size",`${12+Math.random()*23}px`);h.style.setProperty("--heart-color",colors[Math.floor(Math.random()*colors.length)]);h.style.setProperty("--duration",`${.9+Math.random()*.75}s`);layer.appendChild(h);h.addEventListener("animationend",()=>h.remove(),{once:true})}}
+restartButton.addEventListener("click",()=>{document.querySelectorAll("audio").forEach(a=>{a.pause();a.currentTime=0});unlockedThrough=0;finalSurprise.classList.remove("visible");renderChapters();scrollTo({top:0,behavior:"smooth"})});
+createBackgroundHearts();renderChapters();
+</script>
+</body>
+</html>
